@@ -1,0 +1,276 @@
+/*
+ * Copyright (c) 2016 Fuzhou Rockchip Electronics Co., Ltd
+ *
+ * This file is dual-licensed: you can use it either under the terms
+ * of the GPL or the X11 license, at your option. Note that this dual
+ * licensing only applies to this file, and not this project as a
+ * whole.
+ *
+ *  a) This file is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This file is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ * Or, alternatively,
+ *
+ *  b) Permission is hereby granted, free of charge, to any person
+ *     obtaining a copy of this software and associated documentation
+ *     files (the "Software"), to deal in the Software without
+ *     restriction, including without limitation the rights to use,
+ *     copy, modify, merge, publish, distribute, sublicense, and/or
+ *     sell copies of the Software, and to permit persons to whom the
+ *     Software is furnished to do so, subject to the following
+ *     conditions:
+ *
+ *     The above copyright notice and this permission notice shall be
+ *     included in all copies or substantial portions of the Software.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ *     EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ *     OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ *     NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *     HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *     WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ *     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ *     OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+/dts-v1/;
+
+#include "rk3399-firefly-port.dtsi"
+
+/ {
+	model = "ROC-RK3399-PC-Base(Android)";
+	compatible = "rockchip,android", "rockchip,roc-rk3399-pc", "rockchip,rk3399";
+
+	test-power {
+		status = "okay";
+	};
+	 vcc_sd:vcc-sd {
+        compatible = "regulator-fixed";
+        enable-active-high;
+        gpio = <&gpio4 RK_PD6 GPIO_ACTIVE_HIGH>;
+        pinctrl-names = "default";
+        pinctrl-0 = <&vcc_sd_h>;                                                                                                                                                                               
+        regulator-name = "vcc_sd";
+        regulator-min-microvolt = <3300000>;
+        regulator-max-microvolt = <3300000>;
+        //regulator-always-on;
+        //regulator-boot-on;
+    };
+		usb-charge {
+		compatible = "usb-ext-charge";
+		status = "okay";
+		io-channels = <&saradc 0>;
+        extcon = <&fusb0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&vcc_chargen_h &bat_int_h &cur_ctl_h &poe_det_h>;
+	    bat-int = <&gpio2 RK_PD4 IRQ_TYPE_EDGE_RISING>;
+		charge-en-gpios = <&gpio0 RK_PA1 GPIO_ACTIVE_HIGH>;
+		cur-ctl-gpios = <&gpio3 RK_PD2 GPIO_ACTIVE_HIGH>;
+		poe-state-gpios = <&gpio0 RK_PB4 GPIO_ACTIVE_HIGH>;
+	};
+
+};
+/* LPDDR4 configuration */
+&dfi {
+	status = "okay";
+};
+
+&dmc {
+	status = "okay";
+	center-supply = <&vdd_center>;
+	system-status-freq = <
+		/*system status         freq(KHz)*/
+		SYS_STATUS_NORMAL       856000
+		SYS_STATUS_REBOOT       416000
+		SYS_STATUS_SUSPEND      416000
+		SYS_STATUS_VIDEO_1080P  416000
+		SYS_STATUS_VIDEO_4K     856000
+		SYS_STATUS_VIDEO_4K_10B 856000
+		SYS_STATUS_PERFORMANCE  856000
+		SYS_STATUS_BOOST        856000
+		SYS_STATUS_DUALVIEW     856000
+		SYS_STATUS_ISP          856000
+	>;
+	vop-bw-dmc-freq = <
+	/* min_bw(MB/s) max_bw(MB/s) freq(KHz) */
+		0       577      416000
+		578     99999    856000
+	>;
+	auto-min-freq = <416000>;
+	auto-freq-en = <1>;
+};
+
+&dmc_opp_table {
+	compatible = "operating-points-v2";
+
+	opp-200000000 {
+		opp-hz = /bits/ 64 <200000000>;
+		opp-microvolt = <900000>;
+		status = "disabled";
+	};
+	opp-300000000 {
+		opp-hz = /bits/ 64 <300000000>;
+		opp-microvolt = <900000>;
+		status = "disabled";
+	};
+	opp-400000000 {
+		opp-hz = /bits/ 64 <400000000>;
+		opp-microvolt = <900000>;
+		status = "disabled";
+	};
+	opp-416000000 {
+		opp-hz = /bits/ 64 <416000000>;
+		opp-microvolt = <900000>;
+	};
+	opp-528000000 {
+		opp-hz = /bits/ 64 <528000000>;
+		opp-microvolt = <900000>;
+		status = "disabled";
+	};
+	opp-600000000 {
+		opp-hz = /bits/ 64 <600000000>;
+		opp-microvolt = <900000>;
+		status = "disabled";
+	};
+	opp-800000000 {
+		opp-hz = /bits/ 64 <800000000>;
+		opp-microvolt = <900000>;
+		status = "disabled";
+	};
+	opp-856000000 {
+		opp-hz = /bits/ 64 <856000000>;
+		opp-microvolt = <900000>;
+	};
+	opp-928000000 {
+		opp-hz = /bits/ 64 <928000000>;
+		opp-microvolt = <900000>;
+		status = "disabled";
+	};
+	opp-1056000000 {
+		opp-hz = /bits/ 64 <1056000000>;
+		opp-microvolt = <900000>;
+		status = "disabled";
+	};
+};
+/* END LPDDR4 configuration */
+
+/* ROC-RK3399-PC porting */
+&vcc2v8_dvp {
+    regulator-min-microvolt = <1800000>;
+    regulator-max-microvolt = <1800000>;
+};
+
+&vcca1v8_codec {
+    regulator-min-microvolt = <900000>;
+    regulator-max-microvolt = <900000>;
+};
+&io_domains {
+    bt656-supply = <&vcc_3v0>;
+	sdmmc-supply = <&vccio_sd>;     /* sdmmc_gpio4b_ms */
+};
+
+&rk808 {
+	pinctrl-0 = <&pmic_int_l &pmic_dvs2>;
+	/delete-property/ pmic,hold-gpio;
+	/delete-property/ pmic,stby-gpio;
+};
+
+&vcc3v3_3g {
+	status = "disabled";
+};
+
+&rt5640 {
+	status = "disabled";
+};
+&rt5640_sound {
+	status = "disabled";
+};
+
+&spi1{
+	status = "okay";
+    spidev0: spidev@00 {
+        status = "okay";
+        compatible = "jedec,spi-nor";
+        reg = <0x00>;
+        spi-max-frequency = <48000000>;
+    };
+};
+&uart4 {
+	status = "disabled";
+
+};
+/* END ROC-RK3399-PC porting */
+
+&isp0 {
+	status = "okay";
+};
+
+&isp1 {
+	status = "okay";
+};
+
+&isp0_mmu {
+	status = "okay";
+};
+
+&isp1_mmu {
+	status = "okay";
+};
+
+&pcie_phy {
+	status = "okay";
+};
+
+&pcie0 {
+	status = "okay";
+};
+&rk808 {
+	regulators {
+		/delete-node/ LDO_REG4;
+		vccio_sd: LDO_REG4 {
+                regulator-always-on;
+                regulator-boot-on;
+                regulator-min-microvolt = <1800000>;
+                regulator-max-microvolt = <3300000>;
+                regulator-name = "vcc_sd";
+                regulator-state-mem {
+                    regulator-on-in-suspend;
+                    regulator-suspend-microvolt = <3300000>;
+                };
+		};
+      };
+};
+&pinctrl {
+    vcc_sd {
+        vcc_sd_h: vcc-sd-h {
+            rockchip,pins = <4 30 RK_FUNC_GPIO &pcfg_pull_none>;
+        };
+    };
+	chargen {
+		vcc_chargen_h: vcc-chargen-h {
+			rockchip,pins = <0 RK_PA1 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+		bat_int_h: bat-int-h {
+			rockchip,pins = <2 RK_PD4 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+		cur_ctl_h: cur-ctl-h {
+			rockchip,pins = <3 RK_PD2 RK_FUNC_GPIO &pcfg_pull_none_20ma>;
+		};
+		poe_det_h: poe-det-h {
+			rockchip,pins = <0 RK_PB4 RK_FUNC_GPIO &pcfg_pull_down>;
+		};
+	};
+
+};
+&sdmmc {
+	sd-uhs-sdr104;
+	vmmc-supply = <&vcc_sd>;
+    vqmmc-supply = <&vccio_sd>;
+};

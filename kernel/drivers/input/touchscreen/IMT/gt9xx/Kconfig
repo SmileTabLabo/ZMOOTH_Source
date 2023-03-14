@@ -1,0 +1,68 @@
+config TOUCHSCREEN_GT9XX
+    tristate "GT9xx touchscreen driver"
+    depends on I2C
+    depends on !TOUCHSCREEN_GT82X_IIC
+    default n
+    help
+      xxx
+
+choice
+	prompt "Version of GT9XX"
+	depends on TOUCHSCREEN_GT9XX
+	default GT9XX_V2_4
+	
+config GT9XX_V1_2
+	bool "GT9XX V1.2"
+
+config GT9XX_V2_2
+	bool "GT9XX V2.2"
+
+config GT9XX_V2_4
+    bool "GT9XX V2.4"
+
+endchoice
+
+choice
+	prompt "Factory of TP"
+	depends on GT9XX_V2_4
+	default GT9XX_M106_JB
+
+config GT9XX_M102_portrait
+	bool "GT9XX for M102 MJK Portrait"
+
+config GT9XX_KYP
+	bool "GT9XX for KYP"
+
+config GT9XX_TJ
+	bool "GT9XX for Tianjiao"
+
+config GT9XX_M106_JB
+	bool "GT9XX for M106 jiangbang"
+
+config GT9XX_M106_GD
+	bool "GT9XX for M106 Fei chu(Gu De)"
+
+config GT9XX_M106_GG
+	bool "GT9XX for M106 Gao Ge"
+
+config GT9XX_M106_MJK
+	bool "GT9XX for M106 mei ji ke"
+
+config GT9XX_M106_BANANA
+	bool "GT9XX for M106 BANANA"
+
+config GT9XX_k101_dpt
+	bool "GT9XX for K101 KDXF"
+
+config GT9XX_CpCall_dpt
+	bool "GT9XX for Caption Call"
+config GT9XX_lianchuang
+	bool "GT9XX for lianchuang "
+
+config GT9XX_lianchuang_eep
+	bool "GT9XX for lianchuang with eep"
+
+config GT9XX_m810
+	bool "GT9XX for m810"
+endchoice
+

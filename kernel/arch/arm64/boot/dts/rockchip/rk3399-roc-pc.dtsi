@@ -1,0 +1,200 @@
+/*
+ * Copyright (c) 2016 Fuzhou Rockchip Electronics Co., Ltd
+ *
+ * This file is dual-licensed: you can use it either under the terms
+ * of the GPL or the X11 license, at your option. Note that this dual
+ * licensing only applies to this file, and not this project as a
+ * whole.
+ *
+ *  a) This file is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This file is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ * Or, alternatively,
+ *
+ *  b) Permission is hereby granted, free of charge, to any person
+ *     obtaining a copy of this software and associated documentation
+ *     files (the "Software"), to deal in the Software without
+ *     restriction, including without limitation the rights to use,
+ *     copy, modify, merge, publish, distribute, sublicense, and/or
+ *     sell copies of the Software, and to permit persons to whom the
+ *     Software is furnished to do so, subject to the following
+ *     conditions:
+ *
+ *     The above copyright notice and this permission notice shall be
+ *     included in all copies or substantial portions of the Software.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ *     EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ *     OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ *     NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *     HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *     WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ *     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ *     OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+/dts-v1/;
+
+#include "rk3399-roc-pc-base.dtsi"
+
+/ {
+	model = "ROC-RK3399-PC(Android)";
+
+	/* ROC-RK3399-PC porting */
+	vcc_hub_en: vcc-hub-en-regulator {
+		compatible = "regulator-fixed";
+		enable-active-high;
+		gpio = <&gpio2 RK_PA4 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&hub_rst_en>;
+		regulator-name = "vcc_hub_en";
+		regulator-always-on;
+	};
+	/* END ROC-RK3399-PC porting */
+
+};
+
+/* ROC-RK3399-PC porting */
+&vcc5v0_sys {
+		enable-active-high;
+		gpio = <&gpio2 RK_PA6 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = < &vcc_5v0_h>;
+};
+
+&firefly_leds {
+   power_led: power {
+	   label = "firefly:green:power";
+	   linux,default-trigger = "ir-power-click";
+	   default-state = "on";
+	   gpios = <&gpio2 RK_PD3 GPIO_ACTIVE_HIGH>;
+	   pinctrl-names = "default";
+	   pinctrl-0 = <&led_power>;
+   };
+   user_led: user {
+	   label = "firefly:red:user";
+	   linux,default-trigger = "ir-user-click";
+	   default-state = "off";
+	   gpios = <&gpio0 RK_PB5 GPIO_ACTIVE_HIGH>;
+	   pinctrl-names = "default";
+	   pinctrl-0 = <&led_user>;
+   };
+   user_led1: user1 {
+	   label = "firefly:yellow:user";
+	   linux,default-trigger = "ir-user-click";
+	   default-state = "off";
+	   gpios = <&gpio0 RK_PA2 GPIO_ACTIVE_HIGH>;
+	   pinctrl-names = "default";
+	   pinctrl-0 = <&led_user>;
+   };
+};
+
+&i2c4 {
+	/delete-node/ fusb30x@22;
+	fusb1: fusb30x@22 {
+		compatible = "fairchild,fusb302";
+		reg = <0x22>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&fusb1_int &fusb1_vbus_drv>;
+		int-n-gpios = <&gpio1 RK_PA1 GPIO_ACTIVE_HIGH>;
+		vbus-5v-gpios = <&gpio1 RK_PB5 GPIO_ACTIVE_HIGH>;
+		//vbus-supply = <&sys_12v>;
+		status = "okay";
+	};
+};
+
+
+&i2c7 {
+	status = "okay";
+	i2c-scl-rising-time-ns = <200>;
+	i2c-scl-falling-time-ns = <200>;
+	clock-frequency = <400000>;
+
+	fusb0: fusb30x@22 {
+		compatible = "fairchild,fusb302";
+		reg = <0x22>;
+		power-dev = <&mp8859>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&fusb0_int>;
+		int-n-gpios = <&gpio1 RK_PA2 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+	};
+
+	mp8859: mp8859@66 {
+		compatible = "mps,mp8859";
+		reg = <0x66>;
+		status = "okay";
+        extcon = <&fusb0>;
+		max-input-voltage = <15000000>;
+		max-input-current = <3000000>;
+
+		regulators {
+			sys_12v: mp8859_dcdc1 {
+				regulator-name = "sys_12v";
+				regulator-min-microvolt = <12300000>;
+				regulator-max-microvolt = <12300000>;
+				regulator-ramp-delay = <8000>;
+				//regulator-always-on;
+				//regulator-boot-on;
+			};
+		};
+	};
+};
+
+&tcphy1 {
+	extcon = <&fusb1>;
+	status = "okay";
+};
+
+&u2phy1 {
+	status = "okay";
+	extcon = <&fusb1>;
+};
+
+&usbdrd3_1 {
+	status = "okay";
+	extcon = <&fusb1>;
+};
+
+
+&cdn_dp {
+ status = "okay";
+ extcon = <&fusb0 &fusb1>;
+ phys = <&tcphy0_dp &tcphy1_dp>;
+};
+
+
+&gmac {
+    tx_delay = <0x2E>;
+    rx_delay = <0x23>;
+};
+
+&pinctrl {
+	vcc_sys {
+		vcc_5v0_h: vcc-5v0-h {
+			rockchip,pins = <2 6 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+	};
+
+	fusb30x {
+		fusb0_int: fusb0-int {
+			rockchip,pins = <1 2 RK_FUNC_GPIO &pcfg_pull_up>;
+		};
+
+		fusb1_int: fusb1-int {
+			rockchip,pins = <1 1 RK_FUNC_GPIO &pcfg_pull_up>;
+		};
+
+		fusb1_vbus_drv: fusb1-vbus-drv{
+			rockchip,pins = <1 13 RK_FUNC_GPIO &pcfg_pull_up>;
+		};
+	};
+};
+/* END ROC-RK3399-PC porting */

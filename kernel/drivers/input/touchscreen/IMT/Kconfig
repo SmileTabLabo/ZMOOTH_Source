@@ -1,0 +1,11 @@
+menuconfig IMT_INPUT_TOUCHSCREEN
+	bool "Touchscreens for IMT Device"
+	help
+	  Say Y here, and a list of supported touchscreens will be displayed.
+	  This option doesn't affect the kernel.
+
+	  If unsure, say Y.
+
+if IMT_INPUT_TOUCHSCREEN
+source "drivers/input/touchscreen/IMT/gt9xx/Kconfig"
+endif
