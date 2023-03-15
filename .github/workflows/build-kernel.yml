@@ -1,0 +1,49 @@
+name: Build Kernel
+
+on:
+  push:
+    paths:
+      - '.github/workflows/build-kernel.yml'
+      - 'kernel/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Kernel
+    runs-on: ubuntu-20.04
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Cache
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: /usr/local/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu
+          key: gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu
+
+      - name: Install toolchain
+        if: steps.cache.outputs.cache-hit != 'true'
+        working-directory: kernel
+        run: |
+          wget https://releases.linaro.org/components/toolchain/binaries/7.3-2018.05/aarch64-linux-gnu/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz
+          sudo tar xvf gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz  -C /usr/local/
+
+      - name: Build kernel
+        working-directory: kernel
+        run: |
+          export ARCH=arm64
+          export CROSS_COMPILE=/usr/local/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
+          make rockchip_linux_defconfig
+          make -j8
+
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: JJ31-kernel
+          path: |
+            kernel/arch/arm64/boot/Image
+            kernel/arch/arm64/boot/dts/rockchip/rockpi-4b-linux.dtb
+            kernel/arch/arm64/boot/dts/rockchip/overlays-rockpi4
+          if-no-files-found: ignore
