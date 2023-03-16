@@ -29,6 +29,7 @@ jobs:
         run: |
           curl -#LO https://releases.linaro.org/components/toolchain/binaries/7.3-2018.05/aarch64-linux-gnu/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz
           tar xvf gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz  -C ./
+          sudo ln -s $(pwd)/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu /usr/local/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu
           git clone https://github.com/rockchip-linux/rkbin --depth 1 ../rkbin
 
       - name: Build U-Boot
