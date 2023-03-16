@@ -28,7 +28,7 @@ jobs:
         working-directory: u-boot
         run: |
           curl -#LO https://releases.linaro.org/components/toolchain/binaries/6.3-2017.05/aarch64-linux-gnu/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu.tar.xz
-          tar xvf https://releases.linaro.org/components/toolchain/binaries/6.3-2017.05/aarch64-linux-gnu/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu.tar.xz -C ./
+          tar xvf gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu.tar.xz -C ./
           sudo ln -s $(pwd)/gcc-linaro*aarch64-linux-gnu /usr/local/gcc-linaro_aarch64-linux-gnu
           git clone https://github.com/rockchip-linux/rkbin --depth 1 ../rkbin
 
