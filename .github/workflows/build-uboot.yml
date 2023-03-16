@@ -1,4 +1,4 @@
-name: Build Kernel
+name: Build uboot
 
 on:
   push:
@@ -37,8 +37,7 @@ jobs:
         run: |
           export ARCH=arm64
           export CROSS_COMPILE=/usr/local/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
-          make  evb-rk3399_defconfig
-          ./make.sh rk3399
+          ./make.sh evb-rk3399
           
 
       - name: Upload
