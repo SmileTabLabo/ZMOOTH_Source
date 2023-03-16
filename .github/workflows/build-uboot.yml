@@ -27,16 +27,16 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         working-directory: u-boot
         run: |
-          curl -#LO https://releases.linaro.org/components/toolchain/binaries/7.3-2018.05/aarch64-linux-gnu/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz
-          tar xvf gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz  -C ./
-          sudo ln -s $(pwd)/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu /usr/local/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu
+          curl -#LO https://releases.linaro.org/components/toolchain/binaries/6.3-2017.05/aarch64-linux-gnu/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu.tar.xz
+          tar xvf https://releases.linaro.org/components/toolchain/binaries/6.3-2017.05/aarch64-linux-gnu/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu.tar.xz -C ./
+          sudo ln -s $(pwd)/gcc-linaro*aarch64-linux-gnu /usr/local/gcc-linaro_aarch64-linux-gnu
           git clone https://github.com/rockchip-linux/rkbin --depth 1 ../rkbin
 
       - name: Build U-Boot
         working-directory: u-boot
         run: |
           export ARCH=arm64
-          export CROSS_COMPILE=$(pwd)/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
+          export CROSS_COMPILE=$(pwd)/gcc-linaro_aarch64-linux-gnu/bin/aarch64-linux-gnu-
           ./make.sh rk3399
 
       - name: Upload
