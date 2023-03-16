@@ -29,8 +29,10 @@ jobs:
         run: |
           wget https://releases.linaro.org/components/toolchain/binaries/7.3-2018.05/aarch64-linux-gnu/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz
           sudo tar xvf gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz  -C /usr/local/
+          cd ../
+          git clone https://github.com/rockchip-linux/rkbin
 
-      - name: Build kernel
+      - name: Build uboot
         working-directory: u-boot
         run: |
           export ARCH=arm64
