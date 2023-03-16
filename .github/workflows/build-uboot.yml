@@ -37,7 +37,7 @@ jobs:
         run: |
           export ARCH=arm64
           export CROSS_COMPILE=$(pwd)/gcc-linaro_aarch64-linux-gnu/bin/aarch64-linux-gnu-
-          ./make.sh rk3399
+          ./make.sh evb_rk3399
 
       - name: Upload
         uses: actions/upload-artifact@v3
