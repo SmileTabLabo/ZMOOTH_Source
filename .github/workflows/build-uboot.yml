@@ -1,4 +1,4 @@
-name: Build uboot
+name: Build U-Boot
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: Build uboot
+    name: Build U-Boot
     runs-on: ubuntu-20.04
     steps:
 
@@ -20,33 +20,29 @@ jobs:
         id: cache
         uses: actions/cache@v3
         with:
-          path: /usr/local/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu
+          path: gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu
           key: gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu
 
       - name: Install toolchain
         if: steps.cache.outputs.cache-hit != 'true'
         working-directory: u-boot
         run: |
-          wget https://releases.linaro.org/components/toolchain/binaries/7.3-2018.05/aarch64-linux-gnu/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz
-          sudo tar xvf gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz  -C /usr/local/
-          cd ../
-          git clone https://github.com/rockchip-linux/rkbin
+          curl -#LOhttps://releases.linaro.org/components/toolchain/binaries/7.3-2018.05/aarch64-linux-gnu/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz
+          tar xvf gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz  -C ./
+          git clone https://github.com/rockchip-linux/rkbin --depth 1 ../
 
-      - name: Build uboot
+      - name: Build U-Boot
         working-directory: u-boot
         run: |
           export ARCH=arm64
-          export CROSS_COMPILE=/usr/local/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
+          export CROSS_COMPILE=$(pwd)/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
           ./make.sh evb-rk3399
-          
 
       - name: Upload
         uses: actions/upload-artifact@v3
         with:
           name: JJ31-uboot
           path: |
-            u-boot/**.bin
-            u-boot/**.img
-
-
+            u-boot/*.bin
+            u-boot/*.img
           if-no-files-found: ignore
