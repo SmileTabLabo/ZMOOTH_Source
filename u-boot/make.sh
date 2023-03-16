@@ -37,7 +37,7 @@ OBJ_ARM64=aarch64-linux-gnu-objdump
 GCC_ARM32=arm-linux-gnueabihf-
 GCC_ARM64=aarch64-linux-gnu-
 TOOLCHAIN_ARM32=../prebuilts/gcc/linux-x86/arm/gcc-linaro-6.3.1-2017.05-x86_64_arm-linux-gnueabihf/bin
-TOOLCHAIN_ARM64=/usr/local/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu/bin
+TOOLCHAIN_ARM64=/usr/local/gcc-linaro_aarch64-linux-gnu/bin
 
 ########################################### User not touch #############################################
 BIN_PATH_FIXUP="--replace tools/rk_tools/ ./"
