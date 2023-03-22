@@ -2,9 +2,6 @@ name: Build U-Boot
 
 on:
   push:
-    paths:
-      - '.github/workflows/build-uboot.yml'
-      - 'u-boot/**'
   workflow_dispatch:
 
 jobs:
@@ -15,35 +12,59 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Cache
-        id: cache
-        uses: actions/cache@v3
+        
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          path: gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu
-          key: gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu
+          python-version: '2.x'
+          cache: 'pip'
 
-      - name: Install toolchain
-        if: steps.cache.outputs.cache-hit != 'true'
-        working-directory: u-boot
+      - name: Install dependencies
         run: |
-          curl -#LO https://releases.linaro.org/components/toolchain/binaries/6.3-2017.05/aarch64-linux-gnu/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu.tar.xz
-          tar xvf gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu.tar.xz -C ./
-          sudo ln -s $(pwd)/gcc-linaro*aarch64-linux-gnu /usr/local/gcc-linaro_aarch64-linux-gnu
-          git clone https://github.com/rockchip-linux/rkbin --depth 1 ../rkbin
-
-      - name: Build U-Boot
+          sudo apt-get update
+          sudo apt-get install -y curl device-tree-compiler gcc-arm-none-eabi gcc-aarch64-linux-gnu libudev-dev libusb-1.0-0-dev dh-autoreconf
+          python2 -m pip --no-python-version-warning --disable-pip-version-check install -r requirements.txt
+      - name: Clone repositories
+        run: |
+          mkdir u-boot
+          find . -maxdepth 1 -not -name . -not -name .. -not -name .github -not -name u-boot -exec mv {} u-boot/ \;
+          git clone --depth 1 $GITHUB_SERVER_URL/ARM-software/arm-trusted-firmware
+          git clone --depth 1 $GITHUB_SERVER_URL/rockchip-linux/rkbin
+          git clone --depth 1 $GITHUB_SERVER_URL/rockchip-linux/rkdeveloptool
+          
+      - name: Compile ATF
+        working-directory: arm-trusted-firmware
+        run: |
+          make realclean
+          make CROSS_COMPILE=aarch64-linux-gnu- PLAT=rk3399 bl31
+          cp build/rk3399/release/bl31/bl31.elf ../u-boot/
+      - name: Compile U-Boot
         working-directory: u-boot
         run: |
           export ARCH=arm64
-          export CROSS_COMPILE=$(pwd)/gcc-linaro_aarch64-linux-gnu/bin/aarch64-linux-gnu-
-          ./make.sh evb-rk3399
-
+          export CROSS_COMPILE=aarch64-linux-gnu-
+          sed -i -e 's/-Werror//' Makefile
+          echo "CONFIG_BOOTDELAY=5" >> configs/evb-rk3399_defconfig
+          make evb-rk3399_defconfig
+          make
+          make u-boot.itb
+      - name: Install rkdeveloptool
+        working-directory: rkdeveloptool
+        run: |
+          autoreconf -i
+          ./configure
+          make
+          sudo make install
+      - name: Pack image
+        working-directory: rkbin
+        run: |
+          cp ../arm-trusted-firmware/build/rk3399/release/bl31/bl31.elf rk33 
+          sed -i -e "s|bin/rk33/rk3399_bl3|$GITHUB_WORKSPACE/rkbin/bin/rk33/rk3399_bl3|g" RKTRUST/RK3399TRUST.ini
+          ./tools/trust_merger RKTRUST/RK3399TRUST.ini
+          ./tools/loaderimage --pack --uboot ../u-boot/u-boot-dtb.bin uboot.img
+          ./tools/mkimage -n rk3399 -T rksd -d ../u-boot/spl/u-boot-spl.bin idbspl.img
       - name: Upload
         uses: actions/upload-artifact@v3
         with:
-          name: JJ31-uboot
-          path: |
-            u-boot/*.bin
-            u-boot/*.img
-          if-no-files-found: ignore
+          name: rk3399-uboot
+          path: rkbin/*.img
