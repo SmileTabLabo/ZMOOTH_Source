@@ -26,7 +26,6 @@ jobs:
           python2 -m pip --no-python-version-warning --disable-pip-version-check install -r requirements.txt
       - name: Clone repositories
         run: |
-          mkdir u-boot
           git clone --depth 1 $GITHUB_SERVER_URL/ARM-software/arm-trusted-firmware
           git clone --depth 1 $GITHUB_SERVER_URL/rockchip-linux/rkbin
           git clone --depth 1 $GITHUB_SERVER_URL/rockchip-linux/rkdeveloptool
