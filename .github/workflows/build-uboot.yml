@@ -27,7 +27,6 @@ jobs:
       - name: Clone repositories
         run: |
           mkdir u-boot
-          find . -maxdepth 1 -not -name . -not -name .. -not -name .github -not -name u-boot -exec mv {} u-boot/ \;
           git clone --depth 1 $GITHUB_SERVER_URL/ARM-software/arm-trusted-firmware
           git clone --depth 1 $GITHUB_SERVER_URL/rockchip-linux/rkbin
           git clone --depth 1 $GITHUB_SERVER_URL/rockchip-linux/rkdeveloptool
