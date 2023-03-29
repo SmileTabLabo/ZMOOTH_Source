@@ -36,7 +36,7 @@ jobs:
           export ARCH=arm64
           export CROSS_COMPILE=$(pwd)/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
           make RK3399_IMT_defconfig
-          make -j8
+          make -j2
 
       - name: Upload
         uses: actions/upload-artifact@v3
