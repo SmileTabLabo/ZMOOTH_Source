@@ -35,7 +35,7 @@ jobs:
         run: |
           export ARCH=arm64
           export CROSS_COMPILE=$(pwd)/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
-          make RK3399_IMT_LINUX_defconfig
+          make rockchip_linux_defconfig
           make -j2
           mkdir modules
           make INSTALL_MOD_PATH=modules INSTALL_MOD_STRIP=1 modules_install
