@@ -37,6 +37,9 @@ jobs:
           export CROSS_COMPILE=$(pwd)/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
           make RK3399_IMT_defconfig
           make -j2
+          mkdir modules
+          make INSTALL_MOD_PATH=modules INSTALL_MOD_STRIP=1 modules_install
+          
 
       - name: Upload
         uses: actions/upload-artifact@v3
@@ -44,6 +47,6 @@ jobs:
           name: JJ31-kernel
           path: |
             kernel/arch/arm64/boot/Image
-            kernel/arch/arm64/boot/dts/rockchip/rockpi-4b-linux.dtb
-            kernel/arch/arm64/boot/dts/rockchip/overlays-rockpi4
+            kernel/arch/arm64/boot/dts/rockchip/**
+            kernel/modules/**
           if-no-files-found: ignore
